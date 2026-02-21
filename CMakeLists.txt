@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.20)
+project(spell)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	message("Build on Windows")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	message("Build on Linux")
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+else()
+	message("Build on Other OS")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
+
+add_subdirectory(src)

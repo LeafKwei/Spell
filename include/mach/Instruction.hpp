@@ -7,6 +7,6 @@
 #include "io/UniIO.hpp"
 
 /* 指令定义 */
-using Instruction = std::function<void(Reg64Table *rtb, Memory *mem, UniIO *target)>;
+using Instruction = std::function<void(Reg64Table *rtb, UniIO *target)>;
 
 #endif

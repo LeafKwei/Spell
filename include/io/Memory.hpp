@@ -9,8 +9,7 @@
 class Memory{
 public:
     Memory();
-    void write(regsize_t addr, memunit_t mu);
-    memunit_t read(regsize_t addr);
+    charunit_t* ptrof(regsize_t addr);
     
 private:
     std::vector<memunit_t> mem_;

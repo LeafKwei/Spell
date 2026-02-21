@@ -3,8 +3,8 @@
 
 #include "def/types.hpp"
 
-constexpr int UNIIO_ID_REG = 0;
-constexpr int UNIIO_ID_MEM = 1;
+constexpr int UNIIO_ID_MEM= 0;  //内存
+constexpr int UNIIO_ID_REG = 1;   //寄存器
 
 /* 统一寄存器与内存访问方式 */
 class UniIO{

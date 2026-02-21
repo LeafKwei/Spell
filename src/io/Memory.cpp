@@ -4,14 +4,9 @@ Memory::Memory() : mem_(MEM_INIT_SIZE, 0){
     
 }
 
-void Memory::write(regsize_t addr, memunit_t mu){
+charunit_t* Memory::ptrof(regsize_t addr){
     validateAddr(addr);
-    mem_[addr] = mu;
-}
-
-memunit_t Memory::read(regsize_t addr){
-    validateAddr(addr);
-    return mem_[addr];
+    return &(mem_.at(addr));
 }
 
 void Memory::validateAddr(regsize_t addr){
