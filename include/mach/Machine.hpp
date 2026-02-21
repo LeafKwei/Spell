@@ -2,10 +2,10 @@
 #define SPELL_MACHINE_HPP
 
 #include <map>
-#include "types.hpp"
-#include "Instruction.hpp"
-#include "Memory.hpp"
-#include "Reg64Struct.hpp"
+#include "def/types.hpp"
+#include "io/Memory.hpp"
+#include "io/Reg64Table.hpp"
+#include "mach/Instruction.hpp"
 
 class Machine{
 public:
