@@ -30,10 +30,19 @@ private:
     Errno inspectFlag();
     Errno inspectMem();
     Errno applyJump(const std::string &program);
+    bool isIgnored(char ch) const noexcept;
     bool hasFlag(regsize_t reg, regsize_t flag) const noexcept;
     void setFlag(regsize_t *reg, regsize_t flag) noexcept;
     void clrFlag(regsize_t *reg, regsize_t flag) noexcept;
 };
+
+inline bool Machine::isIgnored(char ch) const noexcept{
+    if(std::isblank(ch)){
+        return true;
+    }
+
+    return false;
+}
 
 inline bool Machine::hasFlag(regsize_t reg, regsize_t flag) const noexcept{
     return reg & flag;

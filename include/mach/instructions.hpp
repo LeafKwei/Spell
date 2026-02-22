@@ -39,8 +39,36 @@ inline void subt(Reg64Table *rtb, UniIO *target){ //递减1
     target -> out(target -> in() - 1);
 }
 
-inline void leftshift(Reg64Table *rtb, UniIO *target){ //左移1位
-    target -> out((target -> in() << 1));
+inline void setbit(Reg64Table *rtb, UniIO *target){  //将qox所指定的bit位置1
+    auto offset = rtb -> qox;
+    auto data = target -> in();
+
+    decltype(data) tmp = 1;
+    tmp << offset;
+    data |= tmp;
+    target -> out(data);
+}
+
+inline void clrbit(Reg64Table *rtb, UniIO *target){ //将qox所指定的bit位置0
+    auto offset = rtb -> qox;
+    auto data = target -> in();
+
+    decltype(data) tmp = 1;
+    tmp >> offset;
+    data &= (~tmp);
+    target -> out(data);
+}
+
+inline void leftshift(Reg64Table *rtb, UniIO *target){ //将当前操作对象左移1位
+    target -> out(target -> in() << 1);
+}
+
+inline void rightshift(Reg64Table *rtb, UniIO *target){ ///将当前操作对象右移1位
+    target -> out(target -> in() >> 1);
+}
+
+inline void flip(Reg64Table *rtb, UniIO *target){ //反转操作对象，将零值反转为非零值，非零值反转为零值
+    target -> out(!(target -> in()));
 }
 
 inline void output_to_terminal(Reg64Table *rtb, UniIO *target){ //输出
@@ -52,10 +80,6 @@ inline void input_from_terminal(Reg64Table *rtb, UniIO *target) { //输入
     charunit_t ch;
     std::cin >> ch;
     target -> out(ch);
-}
-
-inline void clear(Reg64Table *rtb, UniIO *target){ //清零
-    target -> out(0);
 }
 
 inline void move_value_to_qtx(Reg64Table *rtb, UniIO *target){ //将操作对象保存到qtx
@@ -82,6 +106,10 @@ inline void select_mem(Reg64Table *rtb, UniIO *target){ //选择内存访问
 /* 特殊寄存器的使能函数，对于用户不可访问的特殊寄存器则不定义相关函数 */
 inline void select_qcx(Reg64Table *rtb, UniIO *target){ //选择qcx为操作对象
     rtb -> qmx = MODE_QCX;
+}
+
+inline void select_qox(Reg64Table *rtb, UniIO *target){ //选择qox为操作对象
+    rtb -> qmx = MODE_QOX;
 }
 
 inline void select_qpx(Reg64Table *rtb, UniIO *target){ //选择qpx为操作对象

@@ -26,17 +26,21 @@ void Machine::initInstructions(){
     instructions_.insert({']', jump_backward});
     instructions_.insert({'+', plus});
     instructions_.insert({'-', subt});
+    instructions_.insert({'!', flip});
+    instructions_.insert({'.', setbit});
+    instructions_.insert({'~', clrbit});
+    instructions_.insert({'(', leftshift});
+    instructions_.insert({')', rightshift});
+    instructions_.insert({'?', subt_qtx_target});
     instructions_.insert({'*', output_to_terminal});
     instructions_.insert({'&', input_from_terminal});
-    instructions_.insert({'^', leftshift});
-    instructions_.insert({'~', clear});
     instructions_.insert({'#', move_value_to_qtx});
     instructions_.insert({'=', move_value_to_target});
-    instructions_.insert({'?', subt_qtx_target});
-    instructions_.insert({'!', shutdown});
+    instructions_.insert({'_', shutdown});
 
     /* 特殊寄存器选择指令 */
     instructions_.insert({'c', select_qcx});
+    instructions_.insert({'o', select_qox});
     instructions_.insert({'p', select_qpx});
     instructions_.insert({'r', select_qrx});
     instructions_.insert({'t', select_qtx});
@@ -64,6 +68,14 @@ Errno Machine::run(const std::string &program){
         /* 取出指令，然后递增qix */
         auto ch = program.at(rtb_.qix);
         rtb_.qix++;
+
+        /* 忽略空白等特定字符 */
+        if(isIgnored(ch)){
+            continue;
+        }
+
+        /* 记录跳转标记 */
+        
 
         /* 根据qmx中保存的模式生成对应的寄存器/内存访问对象 */
         RaiiUniIO target(makeUniIO());

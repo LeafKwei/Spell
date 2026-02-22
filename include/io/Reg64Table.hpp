@@ -20,7 +20,7 @@ struct Reg64Table{
     regsize_t qlx;
     regsize_t qmx;  //模式寄存器(mode)，记录Machine的数据访问模式
     regsize_t qnx;
-    regsize_t qox;
+    regsize_t qox;   //偏移量寄存器(offset)，记录某些操作所需的偏移量
     regsize_t qpx;   //指针寄存器(pointer)，指向当前所在的内存地址
     regsize_t qqx;
     regsize_t qrx;   //结果寄存器(result)，记录某些操作的结果
