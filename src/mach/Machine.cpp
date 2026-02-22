@@ -63,8 +63,9 @@ void Machine::initInstructions(){
 
 Errno Machine::run(const std::string &program){
     auto err = OK;
+    program_ = &program;
 
-    while(rtb_.qix < program.size() && (!hasFlag(rtb_.qfx, FLAG_SHUTD))){  //指令执行完或遇到停机标志时结束循环
+    while(rtb_.qix < program.size() && (!hasFlag(FLAG_SHUTD))){  //指令执行完或遇到停机标志时结束循环
         /* 取出指令，然后递增qix */
         auto ch = program.at(rtb_.qix);
         rtb_.qix++;
@@ -73,9 +74,6 @@ Errno Machine::run(const std::string &program){
         if(isIgnored(ch)){
             continue;
         }
-
-        /* 记录跳转标记 */
-        
 
         /* 根据qmx中保存的模式生成对应的寄存器/内存访问对象 */
         RaiiUniIO target(makeUniIO());
@@ -89,89 +87,100 @@ Errno Machine::run(const std::string &program){
         /* 执行指令 */
         instptr -> second(&rtb_, target.get());
 
-        /* 检查指令执行错误 */
-        err = inspectErr();
-        if(err != OK){
-            return err;
-        }
-
-        /* 检查qfx确认是否需要跳转 */
-        err = applyJump(program);
-        if(err != OK){
-            return err;
+        /* 检查内存、标志等信息 */
+        try{
+            dealwithMem();
+            dealwithFlag();
+        }catch(SpellExcept se){
+            return se.err();
         }
     }
 
     return OK;
 }
 
-Errno Machine::inspectErr(){
-    auto err = OK;
-    err = inspectFlag();
-    if(err != OK){
-        return err;
-    }
-
-    err = inspectMem();
-    if(err != OK){
-        return err;
-    }
-
-    return OK;
-}
-
-Errno Machine::inspectFlag(){
-    return OK;
-}
-
-Errno Machine::inspectMem(){
+void Machine::dealwithMem(){
+    /* 内存指针小于qbx规定的最小界限时抛出异常 */
     if(rtb_.qpx < rtb_.qbx){
-        return EOUT_OF_MEM;
+        throw SpellExcept(EOUT_OF_MEM);
     }
-    
-    return OK;
 }
 
-Errno Machine::applyJump(const std::string &program){
-    /* 向前跳转 */
-    if(hasFlag(rtb_.qfx, FLAG_SKIPF)){
-        clrFlag(&rtb_.qfx, FLAG_SKIPF);
-        
-        auto start = rtb_.qix - 1;  //注意，此时qix已经指向下一条指令(可能是program末尾)，因此需要减1已回到当前指令的位置
-        auto end = program.size();
-        while(start < end && program.at(start) != ']'){
-            ++start;
+void Machine::dealwithFlag(){
+    /* 处理跳转标志 */
+    if(hasFlag(FLAG_JMPF | FLAG_JMPB)) do_dealwithFlag_Jmp();
+}
+
+void Machine::do_dealwithFlag_Jmp(){
+    decltype(rtb_.qix) newqix = 0;
+
+    /* 前向跳转 */
+    if(hasFlag(FLAG_JMPF)){
+        clrFlag(FLAG_JMPF);
+
+        auto start = rtb_.qix - 1;  //减1是为了回到指令 [ 的位置，避免因为qix自增后超出program字符串的长度
+        auto end = program_-> size();
+        auto cnt = -1;
+
+        while(start < end){
+            auto ch = program_-> at(start++);
+
+            /* 遇到右括号时，检查左括号计数是否为0，不为0则继续查找，否则结束查找 */
+            if(ch == ']'){
+                if(cnt > 0){
+                    --cnt;
+                    continue;
+                }
+
+                newqix = start;
+                break;
+            }
+
+            /* 遇到左括号时递增计数，避免因括号嵌套从而导致错误的跳转 */
+            if(ch == '['){
+                ++cnt;
+            }
         }
 
-        /* 到达program末尾仍未找到边界 */
         if(start >= end){
-            return ENO_SIDE;
+            throw SpellExcept(ENO_SIDE);
         }
-
-        rtb_.qix = start + 1; //加1是为了跳过]
-        return OK;
     }
+    /* 后向跳转 */
+    else{
+        clrFlag(FLAG_JMPB);
 
-    /* 向后跳转 */
-    if(hasFlag(rtb_.qfx, FLAG_SKIPB)){
-        clrFlag(&rtb_.qfx, FLAG_SKIPB);
-
-        auto start = rtb_.qix - 1;
+        auto start = rtb_.qix - 1;  //减1是为了回到指令 [ 的位置，避免因为qix自增后超出program字符串的长度
         auto end = -1;
-        while(start > end && program.at(start) != '['){
-            --start;
+        auto cnt = -1;  //避免将当前位置的括号计入到cnt中
+
+        while(start > end){
+            auto ch = program_-> at(start--);
+
+            /* 遇到左括号时，检查右括号计数是否为0，不为0则继续查找，否则结束查找 */
+            if(ch == '['){
+                if(cnt > 0){
+                    --cnt;
+                    continue;
+                }
+
+                newqix = start;
+                break;
+            }
+
+            /* 遇到右括号时递增计数，避免因括号嵌套从而导致错误的跳转 */
+            if(ch == ']'){
+                ++cnt;
+            }
         }
 
-        /* 到达program开头仍未找到边界 */
         if(start <= end){
-            return ENO_SIDE;
+            throw SpellExcept(ENO_SIDE);
         }
-
-        rtb_.qix = start + 1; //加1是为了跳过[
-        return OK;
     }
 
-    return OK;
+    /* 修改qix以实现跳转 */
+    rtb_.qix = newqix;
 }
 
 UniIO* Machine::makeUniIO(){

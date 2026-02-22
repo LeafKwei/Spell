@@ -20,14 +20,14 @@ inline void move_mem_right(Reg64Table *rtb, UniIO *target){ //内存指针右移
 inline void jump_forward(Reg64Table *rtb, UniIO *target){ //条件检测-前跳
     /* 如果qcx为0，则跳转到右中括号]之后，否则继续执行下一条指令 */
     if(rtb -> qcx == 0){
-        rtb -> qfx |= FLAG_SKIPF;
+        rtb -> qfx |= FLAG_JMPF;
     }
 }
 
 inline void jump_backward(Reg64Table *rtb, UniIO *target){ //条件检测-后跳
     /* 如果qcx不为0，则跳转到左中括号之后，否则继续执行下一个指令 */
     if(rtb -> qcx != 0){
-        rtb -> qfx |= FLAG_SKIPB;
+        rtb -> qfx |= FLAG_JMPB;
     }
 }
 
@@ -44,7 +44,7 @@ inline void setbit(Reg64Table *rtb, UniIO *target){  //将qox所指定的bit位�
     auto data = target -> in();
 
     decltype(data) tmp = 1;
-    tmp << offset;
+    tmp <<= offset;
     data |= tmp;
     target -> out(data);
 }
@@ -54,7 +54,7 @@ inline void clrbit(Reg64Table *rtb, UniIO *target){ //将qox所指定的bit位�
     auto data = target -> in();
 
     decltype(data) tmp = 1;
-    tmp >> offset;
+    tmp >>= offset;
     data &= (~tmp);
     target -> out(data);
 }

@@ -20,20 +20,24 @@ public:
 private:
     Reg64Table rtb_;
     Memory      mem_;
-    InstructionMap instructions_;
+    InstructionMap   instructions_;
+    const std::string *program_;
 
     void setup();
     void initInstructions();
     Errno   run(const std::string &program);
     UniIO* makeUniIO();
-    Errno inspectErr();
-    Errno inspectFlag();
-    Errno inspectMem();
-    Errno applyJump(const std::string &program);
+
+    /* 错误处理及特殊功能函数 */
+    void dealwithMem();
+    void dealwithFlag();
+    void do_dealwithFlag_Jmp();
+
+    /* 工具函数 */
     bool isIgnored(char ch) const noexcept;
-    bool hasFlag(regsize_t reg, regsize_t flag) const noexcept;
-    void setFlag(regsize_t *reg, regsize_t flag) noexcept;
-    void clrFlag(regsize_t *reg, regsize_t flag) noexcept;
+    bool hasFlag(regsize_t flag) const noexcept;
+    void setFlag(regsize_t flag) noexcept;
+    void clrFlag(regsize_t flag) noexcept;
 };
 
 inline bool Machine::isIgnored(char ch) const noexcept{
@@ -44,16 +48,16 @@ inline bool Machine::isIgnored(char ch) const noexcept{
     return false;
 }
 
-inline bool Machine::hasFlag(regsize_t reg, regsize_t flag) const noexcept{
-    return reg & flag;
+inline bool Machine::hasFlag(regsize_t flag) const noexcept{
+    return rtb_.qfx & flag;
 }
 
-inline void Machine::setFlag(regsize_t *reg, regsize_t flag) noexcept{
-    (*reg) = (*reg) | flag;
+inline void Machine::setFlag(regsize_t flag) noexcept{
+    rtb_.qfx |= flag;
 }
 
-inline void Machine::clrFlag(regsize_t *reg, regsize_t flag) noexcept{
-    (*reg) = (*reg) & (~flag);
+inline void Machine::clrFlag(regsize_t flag) noexcept{
+    rtb_.qfx &= (~flag);
 }
 
 #endif
