@@ -7,6 +7,8 @@
 #include "def/types.hpp"
 #include "io/Memory.hpp"
 #include "io/Reg64Table.hpp"
+#include "io/impl/MemIO.hpp"
+#include "io/impl/RegIO.hpp"
 #include "mach/Instruction.hpp"
 
 class Machine{
@@ -23,10 +25,20 @@ private:
     InstructionMap   instructions_;
     const std::string *program_;
 
+    /////////////////////////////////////////////////////IO对象
+    MemIO memio_;
+    RegIO   regio_;
+    /////////////////////////////////////////////////////
+
     void setup();
     void initInstructions();
     Errno   run(const std::string &program);
     UniIO* makeUniIO();
+
+    /* IO对象生成函数 */
+    UniIO* make_mem_io();
+    UniIO* make_dev_io();
+    UniIO* make_reg_io();
 
     /* 错误处理及特殊功能函数 */
     void dealwithMem();
@@ -44,6 +56,8 @@ inline bool Machine::isIgnored(char ch) const noexcept{
     if(std::isblank(ch)){
         return true;
     }
+
+    //未来可能还有其他需要忽略的字符，所以此处并不直接以return返回isblank的结果
 
     return false;
 }

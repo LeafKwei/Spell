@@ -1,8 +1,5 @@
 #include "mach/instructions.hpp"
 #include "mach/Machine.hpp"
-#include "io/impl/MemIO.hpp"
-#include "io/impl/RegIO.hpp"
-#include "io/RaiiUniIO.hpp"
 
 Machine::Machine(){
     initInstructions();
@@ -32,8 +29,10 @@ void Machine::initInstructions(){
     instructions_.insert({'(', leftshift});
     instructions_.insert({')', rightshift});
     instructions_.insert({'?', subt_qtx_target});
-    instructions_.insert({'*', output_to_terminal});
-    instructions_.insert({'&', input_from_terminal});
+    instructions_.insert({',', output_to_terminal});
+    instructions_.insert({'.', input_from_terminal});
+    instructions_.insert({';', output_to_device});
+    instructions_.insert({':', input_from_device});
     instructions_.insert({'#', move_value_to_qtx});
     instructions_.insert({'=', move_value_to_target});
     instructions_.insert({'_', shutdown});
@@ -76,7 +75,7 @@ Errno Machine::run(const std::string &program){
         }
 
         /* 根据qmx中保存的模式生成对应的寄存器/内存访问对象 */
-        RaiiUniIO target(makeUniIO());
+        UniIO *uiop = makeUniIO();
 
         /* 查找指令对应的Instruction */
         auto instptr = instructions_.find(ch);
@@ -85,7 +84,7 @@ Errno Machine::run(const std::string &program){
         }
 
         /* 执行指令 */
-        instptr -> second(&rtb_, target.get());
+        instptr -> second(&rtb_, uiop);
 
         /* 检查内存、标志等信息 */
         try{
@@ -184,130 +183,144 @@ void Machine::do_dealwithFlag_Jmp(){
 }
 
 UniIO* Machine::makeUniIO(){
-    /* 内存模式 */
-    if(rtb_.qmx == MODE_MEM){
-        charunit_t *ptr = mem_.ptrof(rtb_.qpx);
-        return new MemIO(ptr);
+    switch(rtb_.qmx){
+        case MODE_MEM:
+            return make_mem_io();
+        case MODE_DEV:
+            return make_dev_io();
+        default:
+            return make_reg_io();
     }
+}
 
-    /* 寄存器模式 */
+UniIO* Machine::make_mem_io(){
+    charunit_t *ptr = mem_.ptrof(rtb_.qpx);
+    memio_.setptr(ptr);
+    return &memio_;
+}
+
+UniIO* Machine::make_dev_io(){
+    
+}
+
+UniIO* Machine::make_reg_io(){
     regsize_t *ptr = nullptr;
     switch(rtb_.qmx){
         /* 特殊寄存器 */
         case MODE_QAX:
             ptr = &rtb_.qax;
-            return new RegIO(ptr);
+            break;
         case MODE_QBX:
             ptr = &rtb_.qbx;
-            return new RegIO(ptr);
+            break;
         case MODE_QCX:
             ptr = &rtb_.qcx;
-            return new RegIO(ptr);
+            break;
         case MODE_QDX:
             ptr = &rtb_.qdx;
-            return new RegIO(ptr);
+            break;
         case MODE_QEX:
             ptr = &rtb_.qex;
-            return new RegIO(ptr);
+            break;
         case MODE_QFX:
             ptr = &rtb_.qfx;
-            return new RegIO(ptr);
+            break;
         case MODE_QGX:
             ptr = &rtb_.qgx;
-            return new RegIO(ptr);
+            break;
         case MODE_QHX:
             ptr = &rtb_.qhx;
-            return new RegIO(ptr);
+            break;
         case MODE_QIX:
             ptr = &rtb_.qix;
-            return new RegIO(ptr);
+            break;
         case MODE_QJX:
             ptr = &rtb_.qjx;
-            return new RegIO(ptr);
+            break;
         case MODE_QKX:
             ptr = &rtb_.qkx;
-            return new RegIO(ptr);
+            break;
         case MODE_QLX:
             ptr = &rtb_.qlx;
-            return new RegIO(ptr);
+            break;
         case MODE_QMX:
             ptr = &rtb_.qmx;
-            return new RegIO(ptr);
+            break;
         case MODE_QNX:
             ptr = &rtb_.qnx;
-            return new RegIO(ptr);
+            break;
         case MODE_QOX:
             ptr = &rtb_.qox;
-            return new RegIO(ptr);
+            break;
         case MODE_QPX:
             ptr = &rtb_.qpx;
-            return new RegIO(ptr);
+            break;
         case MODE_QQX:
             ptr = &rtb_.qqx;
-            return new RegIO(ptr);
+            break;
         case MODE_QRX:
             ptr = &rtb_.qrx;
-            return new RegIO(ptr);
+            break;
         case MODE_QSX:
             ptr = &rtb_.qsx;
-            return new RegIO(ptr);
+            break;
         case MODE_QTX:
             ptr = &rtb_.qtx;
-            return new RegIO(ptr);
+            break;
         case MODE_QUX:
             ptr = &rtb_.qux;
-            return new RegIO(ptr);
+            break;
         case MODE_QVX:
             ptr = &rtb_.qvx;
-            return new RegIO(ptr);
+            break;
         case MODE_QWX:
             ptr = &rtb_.qwx;
-            return new RegIO(ptr);
+            break;
         case MODE_QXX:
             ptr = &rtb_.qxx;
-            return new RegIO(ptr);
+            break;
         case MODE_QYX:
             ptr = &rtb_.qyx;
-            return new RegIO(ptr);
+            break;
         case MODE_QZX:
             ptr = &rtb_.qzx;
-            return new RegIO(ptr);
+            break;
 
         /* 通用寄存器 */
         case MODE_QC0:
             ptr = &rtb_.qc0;
-            return new RegIO(ptr);   
+            break;   
         case MODE_QC1:
             ptr = &rtb_.qc1;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC2:
             ptr = &rtb_.qc2;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC3:
             ptr = &rtb_.qc3;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC4:
             ptr = &rtb_.qc4;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC5:
             ptr = &rtb_.qc5;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC6:
             ptr = &rtb_.qc6;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC7:
             ptr = &rtb_.qc7;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC8:
             ptr = &rtb_.qc8;
-            return new RegIO(ptr);  
+            break;  
         case MODE_QC9:
             ptr = &rtb_.qc9;
-            return new RegIO(ptr);  
-
+            break;  
         default:
-            return new RegIO(nullptr);
+            ptr = nullptr;
     }
 
-    return new MemIO(nullptr);
+    regio_.setptr(ptr);
+    return &regio_;
 }

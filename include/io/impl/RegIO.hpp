@@ -2,12 +2,14 @@
 #define SPELL_REGIO_HPP
 
 #include "io/UniIO.hpp"
-#include "io/Memory.hpp"
+#include "io/Ptrctl.hpp"
 
-class RegIO : public UniIO{
+class RegIO : public UniIO, public Ptrctl{
 public:
-    RegIO(regsize_t *regp);
+    RegIO() =default;
     int           id() override;
+    void*       ptr() override;
+    void        setptr(void *ptr) override;
     regsize_t in() override;
     void        out(regsize_t data) override;
 

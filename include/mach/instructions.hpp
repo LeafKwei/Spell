@@ -71,15 +71,25 @@ inline void flip(Reg64Table *rtb, UniIO *target){ //反转操作对象，将零�
     target -> out(!(target -> in()));
 }
 
-inline void output_to_terminal(Reg64Table *rtb, UniIO *target){ //输出
+inline void output_to_terminal(Reg64Table *rtb, UniIO *target){ //输出到终端
     charunit_t ch = static_cast<charunit_t>(target -> in());
     std::cout << ch;
 }
 
-inline void input_from_terminal(Reg64Table *rtb, UniIO *target) { //输入
+inline void input_from_terminal(Reg64Table *rtb, UniIO *target){ //从终端输入
     charunit_t ch;
     std::cin >> ch;
     target -> out(ch);
+}
+
+inline void output_to_device(Reg64Table *rtb, UniIO *target){ //输出到设备
+    charunit_t ch = static_cast<charunit_t>(rtb -> qtx);
+    target -> out(ch);
+}
+
+inline void input_from_device(Reg64Table *rtb, UniIO *target){ //从设备输入
+    charunit_t ch = target -> in();
+    rtb -> qtx = ch;
 }
 
 inline void move_value_to_qtx(Reg64Table *rtb, UniIO *target){ //将操作对象保存到qtx

@@ -9,7 +9,7 @@ struct Reg64Table{
     regsize_t qax;
     regsize_t qbx;    //基址寄存器(base)，保存用户可访问的内存的起始地址
     regsize_t qcx;    //计数/条件寄存器(count/condition)
-    regsize_t qdx; 
+    regsize_t qdx;    //设备寄存器(device)，用作以后对模拟设备的访问
     regsize_t qex;
     regsize_t qfx;    //标志寄存器(flag)，记录控制Machine运行的标志
     regsize_t qgx;

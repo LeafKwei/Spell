@@ -3,47 +3,50 @@
 
 #include "def/types.hpp"
 
-/* 内存(范围0) */
+/* 内存(0) */
 constexpr regsize_t MODE_MEM = 0;
 
-/* 特殊寄存器(范围1~127) */
-constexpr regsize_t MODE_QAX = 1;
-constexpr regsize_t MODE_QBX = 2;
-constexpr regsize_t MODE_QCX = 3;
-constexpr regsize_t MODE_QDX = 4;
-constexpr regsize_t MODE_QEX = 5;
-constexpr regsize_t MODE_QFX = 6;
-constexpr regsize_t MODE_QGX = 7;
-constexpr regsize_t MODE_QHX = 8;
-constexpr regsize_t MODE_QIX = 9;
-constexpr regsize_t MODE_QJX = 10;
-constexpr regsize_t MODE_QKX = 11;
-constexpr regsize_t MODE_QLX = 12;
-constexpr regsize_t MODE_QMX = 13;
-constexpr regsize_t MODE_QNX = 14;
-constexpr regsize_t MODE_QOX = 15;
-constexpr regsize_t MODE_QPX = 16;
-constexpr regsize_t MODE_QQX = 17;
-constexpr regsize_t MODE_QRX = 18;
-constexpr regsize_t MODE_QSX = 19;
-constexpr regsize_t MODE_QTX = 20;
-constexpr regsize_t MODE_QUX = 21;
-constexpr regsize_t MODE_QVX = 22;
-constexpr regsize_t MODE_QWX = 23;
-constexpr regsize_t MODE_QXX = 24;
-constexpr regsize_t MODE_QYX = 25;
-constexpr regsize_t MODE_QZX = 26;
+/* 设备(1)*/
+constexpr regsize_t MODE_DEV = 1;
 
-/* 通用寄存器(范围128~255) */
-constexpr regsize_t MODE_QC0 = 128;
-constexpr regsize_t MODE_QC1 = 129;
-constexpr regsize_t MODE_QC2 = 130;
-constexpr regsize_t MODE_QC3 = 131;
-constexpr regsize_t MODE_QC4 = 132;
-constexpr regsize_t MODE_QC5 = 133;
-constexpr regsize_t MODE_QC6 = 134;
-constexpr regsize_t MODE_QC7 = 135;
-constexpr regsize_t MODE_QC8 = 136;
-constexpr regsize_t MODE_QC9 = 137;
+/* 寄存器(范围127~255) */
+constexpr regsize_t MODE_QAX = 130;
+constexpr regsize_t MODE_QBX = 131;
+constexpr regsize_t MODE_QCX = 132;
+constexpr regsize_t MODE_QDX = 133;
+constexpr regsize_t MODE_QEX = 134;
+constexpr regsize_t MODE_QFX = 135;
+constexpr regsize_t MODE_QGX = 136;
+constexpr regsize_t MODE_QHX = 137;
+constexpr regsize_t MODE_QIX = 138;
+constexpr regsize_t MODE_QJX = 139;
+constexpr regsize_t MODE_QKX = 140;
+constexpr regsize_t MODE_QLX = 141;
+constexpr regsize_t MODE_QMX = 142;
+constexpr regsize_t MODE_QNX = 143;
+constexpr regsize_t MODE_QOX = 144;
+constexpr regsize_t MODE_QPX = 145;
+constexpr regsize_t MODE_QQX = 146;
+constexpr regsize_t MODE_QRX = 147;
+constexpr regsize_t MODE_QSX = 148;
+constexpr regsize_t MODE_QTX = 149;
+constexpr regsize_t MODE_QUX = 150;
+constexpr regsize_t MODE_QVX = 151;
+constexpr regsize_t MODE_QWX = 152;
+constexpr regsize_t MODE_QXX = 153;
+constexpr regsize_t MODE_QYX = 154;
+constexpr regsize_t MODE_QZX = 155;
+
+/* 通用寄存器 */
+constexpr regsize_t MODE_QC0 = 160;
+constexpr regsize_t MODE_QC1 = 161;
+constexpr regsize_t MODE_QC2 = 162;
+constexpr regsize_t MODE_QC3 = 163;
+constexpr regsize_t MODE_QC4 = 164;
+constexpr regsize_t MODE_QC5 = 165;
+constexpr regsize_t MODE_QC6 = 166;
+constexpr regsize_t MODE_QC7 = 167;
+constexpr regsize_t MODE_QC8 = 168;
+constexpr regsize_t MODE_QC9 = 169;
 
 #endif

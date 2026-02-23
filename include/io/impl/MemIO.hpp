@@ -2,12 +2,15 @@
 #define SPELL_MEMIO_HPP
 
 #include "io/UniIO.hpp"
+#include "io/Ptrctl.hpp"
 #include "io/Memory.hpp"
 
-class MemIO : public UniIO{
+class MemIO : public UniIO, public Ptrctl{
 public:
-    MemIO(charunit_t *unitp);
+    MemIO() =default;
     int           id() override;
+    void*       ptr() override;
+    void        setptr(void *ptr) override;
     regsize_t in() override;
     void        out(regsize_t data) override;
 

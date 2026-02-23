@@ -1,7 +1,11 @@
 #include "io/impl/MemIO.hpp"
 
-MemIO::MemIO(charunit_t *unitp) : unitp_(unitp){
+void* MemIO::ptr(){
+    return unitp_;
+}
 
+void MemIO::setptr(void *ptr){
+    unitp_ = static_cast<charunit_t*>(ptr);
 }
 
 int MemIO::id(){
