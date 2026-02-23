@@ -1,7 +1,10 @@
 set(COMMON_SRC
-    io/MemIO.cpp
-    io/Memory.cpp
-    io/RegIO.cpp
+    io/mem/MemIO.cpp
+    io/mem/Memory.cpp
+    io/reg/RegIO.cpp
+    io/dev/DeviceBus.cpp
+    io/dev/term/TermDevice.cpp
+    io/dev/term/TermDeviceIO.cpp
     mach/Machine.cpp
 )
 

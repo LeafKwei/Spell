@@ -1,18 +1,24 @@
 #include "mach/instructions.hpp"
 #include "mach/Machine.hpp"
+#include "io/dev/term/TermDevice.hpp"
 
 Machine::Machine(){
+    initDevices();
     initInstructions();
 }
 
-Errno Machine::execute(const std::string &program){
+void Machine::execute(const std::string &program){
     setup();
-    return run(program);
+    run(program);
 }
 
 void Machine::setup(){
     rtb_ = Reg64Table{};  //借助列表初始化将所有寄存器初始化为0，然后再赋值给rtb_，从而将rtb_中的所有寄存器初始为0
     rtb_.qsx = 1;  //将qsx设置为1，避免plus和subt指令计算倍数相乘时导致结果为0
+}
+
+void Machine::initDevices(){
+    devbus_.attachDevice(new TermDevice(), DEV_TERM_STDIN, DEV_TERM_STDERR);  //终端
 }
 
 void Machine::initInstructions(){
@@ -24,21 +30,22 @@ void Machine::initInstructions(){
     instructions_.insert({'+', plus});
     instructions_.insert({'-', subt});
     instructions_.insert({'!', flip});
-    instructions_.insert({'.', setbit});
+    instructions_.insert({'^', setbit});
     instructions_.insert({'~', clrbit});
     instructions_.insert({'(', leftshift});
     instructions_.insert({')', rightshift});
     instructions_.insert({'?', subt_qtx_target});
-    instructions_.insert({',', output_to_terminal});
-    instructions_.insert({'.', input_from_terminal});
-    instructions_.insert({';', output_to_device});
-    instructions_.insert({':', input_from_device});
+    instructions_.insert({'.', output_to_terminal});
+    instructions_.insert({',', input_from_terminal});
+    instructions_.insert({':', output_to_device});
+    instructions_.insert({';', input_from_device});
     instructions_.insert({'#', move_value_to_qtx});
     instructions_.insert({'=', move_value_to_target});
     instructions_.insert({'_', shutdown});
 
     /* 特殊寄存器选择指令 */
     instructions_.insert({'c', select_qcx});
+    instructions_.insert({'d', select_qdx});
     instructions_.insert({'o', select_qox});
     instructions_.insert({'p', select_qpx});
     instructions_.insert({'r', select_qrx});
@@ -46,6 +53,9 @@ void Machine::initInstructions(){
 
     /* 内存选择指令 */
     instructions_.insert({'@', select_mem});
+
+    /* 设备选择指令 */
+    instructions_.insert({'$', select_dev});
 
     /* 通用寄存器选择指令 */
     instructions_.insert({'0', select_qc0});
@@ -60,7 +70,7 @@ void Machine::initInstructions(){
     instructions_.insert({'9', select_qc9});
 }
 
-Errno Machine::run(const std::string &program){
+void Machine::run(const std::string &program){
     auto err = OK;
     program_ = &program;
 
@@ -80,22 +90,16 @@ Errno Machine::run(const std::string &program){
         /* 查找指令对应的Instruction */
         auto instptr = instructions_.find(ch);
         if(instptr == instructions_.end()){
-            return EBAD_INST;
+            throw SpellExcept(EBAD_INST);
         }
 
         /* 执行指令 */
         instptr -> second(&rtb_, uiop);
 
         /* 检查内存、标志等信息 */
-        try{
-            dealwithMem();
-            dealwithFlag();
-        }catch(SpellExcept se){
-            return se.err();
-        }
+        dealwithMem();
+        dealwithFlag();
     }
-
-    return OK;
 }
 
 void Machine::dealwithMem(){
@@ -183,14 +187,25 @@ void Machine::do_dealwithFlag_Jmp(){
 }
 
 UniIO* Machine::makeUniIO(){
+    UniIO *unip = nullptr;
+
     switch(rtb_.qmx){
         case MODE_MEM:
-            return make_mem_io();
+            unip = make_mem_io();
+            break;
         case MODE_DEV:
-            return make_dev_io();
+            unip = make_dev_io();
+            break;
         default:
-            return make_reg_io();
+            unip = make_reg_io();
     }
+
+    /* 如果端口没有对应的设备可处理，那么id字段会被设置为BAD，此时应抛出异常 */
+    if(unip -> id() == UNIIO_ID_BAD){
+        throw SpellExcept(EBAD_IO);
+    }
+
+    return unip;
 }
 
 UniIO* Machine::make_mem_io(){
@@ -200,7 +215,7 @@ UniIO* Machine::make_mem_io(){
 }
 
 UniIO* Machine::make_dev_io(){
-    
+    return devbus_.portIO(rtb_.qdx);
 }
 
 UniIO* Machine::make_reg_io(){

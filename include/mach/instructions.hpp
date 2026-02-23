@@ -113,9 +113,18 @@ inline void select_mem(Reg64Table *rtb, UniIO *target){ //选择内存访问
     rtb -> qmx = MODE_MEM;
 }
 
+/* 设备使能函数 */
+inline void select_dev(Reg64Table *rtb, UniIO *target){ //选择设备访问
+    rtb -> qmx = MODE_DEV;
+}
+
 /* 特殊寄存器的使能函数，对于用户不可访问的特殊寄存器则不定义相关函数 */
 inline void select_qcx(Reg64Table *rtb, UniIO *target){ //选择qcx为操作对象
     rtb -> qmx = MODE_QCX;
+}
+
+inline void select_qdx(Reg64Table *rtb, UniIO *target){ //选择qdx为操作对象
+    rtb -> qmx = MODE_QDX;
 }
 
 inline void select_qox(Reg64Table *rtb, UniIO *target){ //选择qox为操作对象

@@ -1,4 +1,4 @@
-#include "io/Memory.hpp"
+#include "io/mem/Memory.hpp"
 
 Memory::Memory() : mem_(MEM_INIT_SIZE, 0){
     

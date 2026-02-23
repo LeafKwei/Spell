@@ -13,6 +13,8 @@ public:
     
 private:
     std::vector<memunit_t> mem_;
+
+private:
     void validateAddr(regsize_t addr);
     void resize(regsize_t base);
 };

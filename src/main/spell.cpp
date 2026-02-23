@@ -27,10 +27,12 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    err = machine.execute(program);
-    if(err != OK){
-        std::cerr << "spell: execution failed with errno:  " << err << std::endl;
+    try{
+        machine.execute(program);
+    }catch(SpellExcept &se){
+        std::cerr << "spell: execution failed with errno:  " << se.err() << std::endl;
+        return se.err();
     }
 
-    return err != OK;
+    return 0;
 }

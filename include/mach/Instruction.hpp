@@ -2,8 +2,8 @@
 #define SPELL_INSTRUCTION_HPP
 
 #include <functional>
-#include "io/Memory.hpp"
-#include "io/Reg64Table.hpp"
+#include "io/mem/Memory.hpp"
+#include "io/reg/Reg64Table.hpp"
 #include "io/UniIO.hpp"
 
 /* 指令定义 */

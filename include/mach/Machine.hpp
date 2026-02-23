@@ -5,10 +5,11 @@
 #include <string>
 #include "def/err.hpp"
 #include "def/types.hpp"
-#include "io/Memory.hpp"
-#include "io/Reg64Table.hpp"
-#include "io/impl/MemIO.hpp"
-#include "io/impl/RegIO.hpp"
+#include "io/mem/Memory.hpp"
+#include "io/mem/MemIO.hpp"
+#include "io/reg/Reg64Table.hpp"
+#include "io/reg/RegIO.hpp"
+#include "io/dev/DeviceBus.hpp"
 #include "mach/Instruction.hpp"
 
 class Machine{
@@ -17,22 +18,22 @@ public:
 
 public:
     Machine();
-    Errno execute(const std::string &program);
+    void execute(const std::string &program);
 
 private:
     Reg64Table rtb_;
     Memory      mem_;
+    DeviceBus   devbus_;
     InstructionMap   instructions_;
     const std::string *program_;
-
-    /////////////////////////////////////////////////////IO对象
     MemIO memio_;
     RegIO   regio_;
-    /////////////////////////////////////////////////////
 
+private:
     void setup();
+    void initDevices();
     void initInstructions();
-    Errno   run(const std::string &program);
+    void run(const std::string &program);
     UniIO* makeUniIO();
 
     /* IO对象生成函数 */
